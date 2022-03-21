@@ -1,6 +1,6 @@
 {
   "name": "sistemas-baz-util",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -12,7 +12,7 @@
     "copy-readme": "cp README.md dist/encryption-util",
     "copy-files": "npm run copy-license && npm run copy-readme",
     "npm_pack": "cd dist/encryption-util && npm pack",
-    "npm_publish": "npm publish ./dist/encryption-util/encryption-util-0.0.2.tgz",
+    "npm_publish": "npm publish ./dist/encryption-util/encryption-util-0.0.5.tgz",
     "package": "npm run build_lib && npm run copy-files && npm run npm_pack"
   },
   "private": true,

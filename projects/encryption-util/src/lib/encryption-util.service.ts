@@ -10,41 +10,79 @@ export class EncryptionUtilService {
   constructor() {
   }
 
-  async encryptKey(valor, aes, hmac) {
-    const aesK = aes;
-    const hmack = hmac;
-    var rest = valor;
-    let encrypted = await this.encryptAes(rest, aesK, hmack);
-    // console.log('encryptKey: encrypted key: ' + encrypted);
-    return encrypted;
+  async encryptKey(value, aes, hmac) {
+    try {
+      const aesK = aes;
+      const hmacK = hmac;
+      const rest = value;
+      return await this.encryptAes(rest, aesK, hmacK);
+    } catch (e) {
+      // console.log('encryptKey: error: ', e);
+      return '';
+    }
   };
 
-  async decryptKey(path: string, aes: string, hmac: string) {
-    const aesK = aes;
-    const hmack = hmac;
-    var rest = path;
-    let decrypted = await this.decryptAes(rest, aesK, hmack);
-    // console.log('decryptKey: decrypted key: ' + decrypted);
-    return decrypted;
+  async decryptKey(value: string, aes: string, hmac: string) {
+    try {
+      const aesK = aes;
+      const hmacK = hmac;
+      const rest = value;
+      return await this.decryptAes(rest, aesK, hmacK);
+    } catch (e) {
+      // console.log('decryptKey: error: ', e);
+      return '';
+    }
   }
 
+  async encryptRSA(value, privateKey) {
+    try {
+      const key = '-----BEGIN PUBLIC KEY-----\n' + privateKey + '\n-----END PUBLIC KEY-----';
+      let encryptBuff = crypto.publicEncrypt(
+        {
+          key,
+          padding: crypto.constants.RSA_PKCS1_PADDING,
+        },
+        Buffer.from(value)
+      );
+      return encryptBuff.toString('base64');
+    } catch (e) {
+      // console.log('encryptRSA: error: ', e);
+      return '';
+    }
+  };
+
+  async decryptRSA(value, privateKey) {
+    try {
+      const key = '-----BEGIN PRIVATE KEY-----\n' + privateKey + '\n-----END PRIVATE KEY-----';
+      const paddingValue = crypto.constants.RSA_PKCS1_PADDING;
+
+      // @ts-ignore
+      const msg = new Buffer.from(value, 'base64');
+      return crypto.privateDecrypt({key, padding: paddingValue}, msg).toString();
+    } catch (e) {
+      // console.log('decryptRSA: error: ', e);
+      return '';
+    }
+  };
+
   async encryptAes(plainText, aesK, hmack) {
-    var datoAcifrar = plainText.replace(/['"]+/g, '');
-    var aesKey = Buffer.from(aesK, 'utf8');
+    const valueToEncrypt = plainText.replace(/['"]+/g, '');
+
+    let aesKey = Buffer.from(aesK, 'utf8');
     aesKey = Buffer.from(aesK, 'base64');
-    var aesHmac = Buffer.from(hmack, 'utf8');
-    // @ts-ignore
-    aesHmac = Buffer.from(aesHmac, 'base64');
+
+    // let aesHmac = Buffer.from(hmack, 'utf8');
+    // // @ts-ignore
+    // aesHmac = Buffer.from(aesHmac, 'base64');
     const iv = crypto.randomBytes(16);
-
     const cipher = crypto.createCipheriv(await this.getAlgorithm(aesKey), aesKey, iv);
-    let cipherText = Buffer.concat([cipher.update(Buffer.from(datoAcifrar, 'utf8')), cipher.final()]);
-    const iv_cipherText = Buffer.concat([iv, cipherText]);
-    var hmac = crypto.createHmac('SHA256', Buffer.from(hmack, 'base64')).update(iv_cipherText).digest();
-    const iv_cipherText_hmac = Buffer.concat([iv_cipherText, hmac]);
-    const iv_cipherText_hmac_base64 = iv_cipherText_hmac.toString('base64');
 
-    return iv_cipherText_hmac_base64;
+    let cipherText = Buffer.concat([cipher.update(Buffer.from(valueToEncrypt, 'utf8')), cipher.final()]);
+    const ivCipherText = Buffer.concat([iv, cipherText]);
+    const hmac = crypto.createHmac('SHA256', Buffer.from(hmack, 'base64')).update(ivCipherText).digest();
+    const ivCipherTextHmac = Buffer.concat([ivCipherText, hmac]);
+
+    return ivCipherTextHmac.toString('base64');
   }
 
   async decryptAes(encryptedValue: string, aesK: string, hmacK: string) {
@@ -64,25 +102,6 @@ export class EncryptionUtilService {
 
     return decrypted.toString();
   }
-
-  encryptRSA(valor, pubKey) {
-    let encryptBuff = crypto.publicEncrypt(
-      {
-        key: pubKey,
-        padding: crypto.constants.RSA_PKCS1_PADDING,
-      },
-      Buffer.from(valor)
-    );
-    return encryptBuff.toString('base64');
-  };
-
-  decryptRSA(valor, privKey) {
-    const paddingValue = crypto.constants.RSA_PKCS1_PADDING;
-    // @ts-ignore
-    var msg = new Buffer.from(valor, 'base64');
-    var descryptValue = crypto.privateDecrypt({key: privKey, padding: paddingValue}, msg);
-    return descryptValue.toString();
-  };
 
   async getAlgorithm(keyBase64: any) {
     const key = Buffer.from(keyBase64, 'base64');
