@@ -43,3 +43,7 @@ Thumbs.db
 
 # Custom
 projects/encryption-util/node_modules
+
+# Angular v13
+.angular
+.angular/*
