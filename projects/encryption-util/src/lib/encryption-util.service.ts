@@ -18,7 +18,7 @@ export class EncryptionUtilService {
       return await this.encryptAes(rest, aesK, hmacK);
     } catch (e) {
       // console.log('encryptKey: error: ', e);
-      return '';
+      return value;
     }
   };
 
@@ -30,7 +30,7 @@ export class EncryptionUtilService {
       return await this.decryptAes(rest, aesK, hmacK);
     } catch (e) {
       // console.log('decryptKey: error: ', e);
-      return '';
+      return value;
     }
   }
 
@@ -47,7 +47,7 @@ export class EncryptionUtilService {
       return encryptBuff.toString('base64');
     } catch (e) {
       // console.log('encryptRSA: error: ', e);
-      return '';
+      return value;
     }
   };
 
@@ -61,7 +61,7 @@ export class EncryptionUtilService {
       return crypto.privateDecrypt({key, padding: paddingValue}, msg).toString();
     } catch (e) {
       // console.log('decryptRSA: error: ', e);
-      return '';
+      return value;
     }
   };
 
