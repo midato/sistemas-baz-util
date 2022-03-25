@@ -66,41 +66,49 @@ export class EncryptionUtilService {
   };
 
   async encryptAes(plainText, aesK, hmack) {
-    const valueToEncrypt = plainText.replace(/['"]+/g, '');
-
-    let aesKey = Buffer.from(aesK, 'utf8');
-    aesKey = Buffer.from(aesK, 'base64');
-
-    // let aesHmac = Buffer.from(hmack, 'utf8');
-    // // @ts-ignore
-    // aesHmac = Buffer.from(aesHmac, 'base64');
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(await this.getAlgorithm(aesKey), aesKey, iv);
-
-    let cipherText = Buffer.concat([cipher.update(Buffer.from(valueToEncrypt, 'utf8')), cipher.final()]);
-    const ivCipherText = Buffer.concat([iv, cipherText]);
-    const hmac = crypto.createHmac('SHA256', Buffer.from(hmack, 'base64')).update(ivCipherText).digest();
-    const ivCipherTextHmac = Buffer.concat([ivCipherText, hmac]);
-
-    return ivCipherTextHmac.toString('base64');
+    try {
+      const valueToEncrypt = plainText.replace(/['"]+/g, '');
+  
+      let aesKey = Buffer.from(aesK, 'utf8');
+      aesKey = Buffer.from(aesK, 'base64');
+  
+      // let aesHmac = Buffer.from(hmack, 'utf8');
+      // // @ts-ignore
+      // aesHmac = Buffer.from(aesHmac, 'base64');
+      const iv = crypto.randomBytes(16);
+      const cipher = crypto.createCipheriv(await this.getAlgorithm(aesKey), aesKey, iv);
+  
+      let cipherText = Buffer.concat([cipher.update(Buffer.from(valueToEncrypt, 'utf8')), cipher.final()]);
+      const ivCipherText = Buffer.concat([iv, cipherText]);
+      const hmac = crypto.createHmac('SHA256', Buffer.from(hmack, 'base64')).update(ivCipherText).digest();
+      const ivCipherTextHmac = Buffer.concat([ivCipherText, hmac]);
+  
+      return ivCipherTextHmac.toString('base64');
+    } catch (e) {
+      return plainText;
+    }
   }
 
   async decryptAes(encryptedValue: string, aesK: string, hmacK: string) {
-    const ivCipherTextHmac = Buffer.from(encryptedValue, 'base64');
-    const aesKey = Buffer.from(aesK, 'base64');
-    const hmacKey = Buffer.from(hmacK, 'utf8');
-    const macLength = crypto.createHmac('sha256', hmacKey).digest().length;
-
-    const cipherTextLength = ivCipherTextHmac.length - macLength;
-    const iv = ivCipherTextHmac.slice(0, 16);
-    const cipherText = ivCipherTextHmac.slice(16, cipherTextLength);
-    const decipher = crypto.createDecipheriv(await this.getAlgorithm(aesKey), aesKey, iv);
-
-    let decrypted = decipher.update(cipherText);
-    // @ts-ignore
-    decrypted += decipher.final();
-
-    return decrypted.toString();
+    try {
+      const ivCipherTextHmac = Buffer.from(encryptedValue, 'base64');
+      const aesKey = Buffer.from(aesK, 'base64');
+      const hmacKey = Buffer.from(hmacK, 'utf8');
+      const macLength = crypto.createHmac('sha256', hmacKey).digest().length;
+  
+      const cipherTextLength = ivCipherTextHmac.length - macLength;
+      const iv = ivCipherTextHmac.slice(0, 16);
+      const cipherText = ivCipherTextHmac.slice(16, cipherTextLength);
+      const decipher = crypto.createDecipheriv(await this.getAlgorithm(aesKey), aesKey, iv);
+  
+      let decrypted = decipher.update(cipherText);
+      // @ts-ignore
+      decrypted += decipher.final();
+  
+      return decrypted.toString();
+    } catch (e) {
+      return encryptedValue;
+    }
   }
 
   async getAlgorithm(keyBase64: any) {
