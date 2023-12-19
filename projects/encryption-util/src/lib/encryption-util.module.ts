@@ -1,16 +1,14 @@
-import { NgModule } from '@angular/core';
-import { EncryptionUtilComponent } from './encryption-util.component';
-
-
+import {NgModule} from '@angular/core';
+import {EncryptionUtilComponent} from './encryption-util.component';
 
 @NgModule({
   declarations: [
     EncryptionUtilComponent
   ],
-  imports: [
-  ],
+  imports: [],
   exports: [
     EncryptionUtilComponent
   ]
 })
-export class EncryptionUtilModule { }
+export class EncryptionUtilModule {
+}

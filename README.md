@@ -1,6 +1,10 @@
-# SistemasBazUtil
+# Sistemas BAZ Util (ENCRYPTION RSA OAEP) v1.0.0
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.0.
+
+## Node Version
+
+`v12.x.x`
 
 ## Development server
 

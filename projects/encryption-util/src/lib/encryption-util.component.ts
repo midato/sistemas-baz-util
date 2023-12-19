@@ -7,17 +7,14 @@ import { Component, OnInit } from '@angular/core';
       encryption-util works!
     </p>
   `,
-  styles: [
-  ]
+  styles: [],
 })
 export class EncryptionUtilComponent implements OnInit {
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit(): void {
   }
-
-
-
 
 }
