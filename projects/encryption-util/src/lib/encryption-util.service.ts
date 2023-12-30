@@ -57,7 +57,6 @@ export class EncryptionUtilService {
 
   async encryptRSA(value, publicKey) {
     try {
-      // const key = '-----BEGIN PUBLIC KEY-----\n' + publicKey + '\n-----END PUBLIC KEY-----';
       const normalizedPublicKeyKey = this._toKeyWithPem(
         publicKey,
         'public',
@@ -77,7 +76,6 @@ export class EncryptionUtilService {
 
   async decryptRSA(value, privateKey) {
     try {
-      // const key = '-----BEGIN PRIVATE KEY-----\n' + privateKey + '\n-----END PRIVATE KEY-----';
       const normalizedPrivateKey = this._toKeyWithPem(
         privateKey,
         'private',
@@ -220,13 +218,11 @@ export class EncryptionUtilService {
         publicKey,
         'public',
       );
-      console.log(normalizedPublicKey);
-
       const publicKeyFromPem = forge.pki.publicKeyFromPem(normalizedPublicKey);
       const encrypted = publicKeyFromPem.encrypt(value, 'RSA-OAEP', {
         md: forge.md.sha256.create(),
         mgf1: {
-          md: forge.md.sha1.create(),
+          md: forge.md.sha256.create(),
         },
       });
       return forge.util.encode64(encrypted);
